@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design System - Digital Healing Studio */
+
+:root {
+  /* Primary - Deep Sage */
+  --sage: #5F7A6B;
+  --sage-light: #8A9E94;
+  --sage-muted: #9BAFA4;
+  
+  /* Background - Warm Sand */
+  --sand: #F8F6F2;
+  --sand-dark: #F0EDE8;
+  
+  /* Accent - Dusty Rose */
+  --rose: #C9A9A6;
+  --rose-light: #E8D5D3;
+  
+  /* Neutrals */
+  --cream: #FDFCFA;
+  --taupe: #A89F94;
+  --charcoal: #4A4540;
+  --charcoal-light: #6B6560;
+  
+  /* Success */
+  --success: #7A9B76;
+  --success-muted: #A8C4A4;
+  
+  /* Shadows */
+  --shadow-soft: 0 4px 16px rgba(74, 69, 64, 0.06);
+  --shadow-card: 0 6px 24px rgba(74, 69, 64, 0.08);
+  
+  /* Transitions */
+  --transition: 300ms ease;
+}
+
+body {
+  margin: 0;
+  font-family: 'Assistant', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--charcoal);
+  background-color: var(--sand);
+}
+
+/* Headings - Frank Ruhl Libre */
+.font-serif {
+  font-family: 'Frank Ruhl Libre', Georgia, serif;
+}
+
+h1, h2, h3 {
+  font-family: 'Frank Ruhl Libre', Georgia, serif;
+  font-weight: 500;
+  color: var(--charcoal);
+  margin: 0;
+}
+
+/* RTL support */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+/* Card styles */
+.card {
+  background: var(--cream);
+  border-radius: 24px;
+  box-shadow: var(--shadow-soft);
+  transition: box-shadow var(--transition);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card);
+}
+
+/* Input styles */
+input, textarea, select {
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--sage);
+  box-shadow: 0 0 0 2px rgba(95, 122, 107, 0.15);
+}
