@@ -1,0 +1,10 @@
+{
+  "name": "Flukee",
+  "short_name": "Flukee",
+  "description": "Coaching platform - practices and reflections",
+  "start_url": "/login",
+  "display": "standalone",
+  "background_color": "#F8F6F2",
+  "theme_color": "#5F7A6B",
+  "orientation": "portrait"
+}
