@@ -6,6 +6,11 @@ export const traineeService = {
     return response.data.trainees;
   },
 
+  async getMyCoach() {
+    const response = await api.get('/api/trainees/coach');
+    return response.data.coach;
+  },
+
   async getTraineeOverview(traineeId) {
     const response = await api.get(`/api/coaches/trainees/${traineeId}`);
     return response.data;

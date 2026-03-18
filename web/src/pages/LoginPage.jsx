@@ -20,8 +20,8 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
-      navigate('/trainees');
+      const res = await login(email, password);
+      navigate(res.user?.role === 'trainee' ? '/my-tasks' : '/trainees');
     } catch (err) {
       setError(err.response?.data?.error?.message || t('login.checkCredentials'));
     } finally {
@@ -41,7 +41,7 @@ export default function LoginPage() {
               {t('login.title')}
             </h1>
             <p className="text-charcoal-light">
-              {t('login.subtitleCoach')}
+              {t('login.subtitle')}
             </p>
           </div>
 

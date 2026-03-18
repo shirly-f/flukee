@@ -7,6 +7,8 @@ import TraineeListPage from './pages/TraineeListPage';
 import TraineeOverviewPage from './pages/TraineeOverviewPage';
 import CreateTaskPage from './pages/CreateTaskPage';
 import MessagesPage from './pages/MessagesPage';
+import TraineeHomePage from './pages/TraineeHomePage';
+import TraineeTaskDetailPage from './pages/TraineeTaskDetailPage';
 
 function PrivateRoute({ children }) {
   const { t } = useTranslation();
@@ -21,6 +23,33 @@ function PrivateRoute({ children }) {
   }
   
   if (user.role !== 'coach') {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return children;
+}
+
+function HomeRedirect() {
+  const { t } = useTranslation();
+  const { user, loading } = useAuth();
+  if (loading) return <div className="flex items-center justify-center min-h-screen">{t('common.loading')}</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  return <Navigate to={user.role === 'trainee' ? '/my-tasks' : '/trainees'} replace />;
+}
+
+function TraineeRoute({ children }) {
+  const { t } = useTranslation();
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">{t('common.loading')}</div>;
+  }
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (user.role !== 'trainee') {
     return <Navigate to="/login" replace />;
   }
   
@@ -64,7 +93,23 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route path="/" element={<Navigate to="/trainees" replace />} />
+        <Route
+          path="/my-tasks"
+          element={
+            <TraineeRoute>
+              <TraineeHomePage />
+            </TraineeRoute>
+          }
+        />
+        <Route
+          path="/my-tasks/:taskId"
+          element={
+            <TraineeRoute>
+              <TraineeTaskDetailPage />
+            </TraineeRoute>
+          }
+        />
+        <Route path="/" element={<HomeRedirect />} />
       </Routes>
     </AuthProvider>
   );
