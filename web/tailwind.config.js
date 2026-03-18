@@ -27,7 +27,7 @@ export default {
         cream: '#FDFCFA',
       },
       fontFamily: {
-        serif: ['Assistant', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        serif: ['DM Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         'serif-he': ['Heebo', 'Assistant', 'sans-serif'],
         sans: ['Assistant', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },

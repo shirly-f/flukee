@@ -45,9 +45,9 @@ body {
   background-color: var(--sand);
 }
 
-/* Headings - Assistant (English), Heebo (Hebrew) */
+/* Headings - DM Sans (English), Heebo (Hebrew) */
 .font-serif {
-  font-family: 'Assistant', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 600;
 }
 
@@ -59,7 +59,7 @@ body {
 }
 
 h1, h2, h3 {
-  font-family: 'Assistant', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 600;
   color: var(--charcoal);
   margin: 0;
