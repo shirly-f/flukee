@@ -12,6 +12,7 @@ import { getMyCoach } from './api/trainees/coach.js';
 import { listTrainees, getTraineeOverview, getTraineeTasks } from './api/coaches/trainees.js';
 import { getMessages, sendMessage } from './api/messages/index.js';
 import { login, register, getCurrentUser } from './api/auth.js';
+import { googleSignIn } from './api/authGoogle.js';
 import { registerPushToken } from './api/users/pushToken.js';
 import { seedDatabase } from './db/index.js';
 
@@ -35,6 +36,7 @@ app.get('/health', (req, res) => {
 // Auth routes (no auth required)
 app.post('/auth/login', login);
 app.post('/auth/register', register);
+app.post('/auth/google', googleSignIn);
 app.get('/auth/me', authenticate, getCurrentUser);
 
 // Coach routes

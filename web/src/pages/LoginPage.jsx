@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../hooks/useAuth';
 import { authService } from '../services/authService';
 import api, { API_BASE_URL } from '../services/api';
@@ -13,8 +14,31 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [backendReachable, setBackendReachable] = useState(null);
-  const { login } = useAuth();
+  const { login, setSession } = useAuth();
   const navigate = useNavigate();
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    if (!credentialResponse?.credential) return;
+    setLoading(true);
+    setError('');
+    try {
+      const authRes = await api.post('/auth/google', {
+        idToken: credentialResponse.credential,
+        role: 'trainee',
+      });
+      const data = authRes.data;
+      setSession(data.token, data.user);
+      navigate(data.user?.role === 'trainee' ? '/my-tasks' : '/trainees');
+    } catch (err) {
+      setError(err.response?.data?.error?.message || 'Google sign-in failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setError('Google sign-in was cancelled or failed');
+  };
 
   useEffect(() => {
     api.get('/health', { timeout: 60000 }).then(() => setBackendReachable(true)).catch(() => setBackendReachable(false));
@@ -111,6 +135,30 @@ export default function LoginPage() {
             >
               {loading ? t('login.signingIn') : t('login.signIn')}
             </button>
+
+            {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+              <div className="mt-6">
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-sand-dark" />
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-cream text-charcoal-light">{t('login.or')}</span>
+                  </div>
+                </div>
+                <div className="flex justify-center">
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    useOneTap={false}
+                    theme="filled_black"
+                    size="large"
+                    text="continue_with"
+                    shape="rectangular"
+                  />
+                </div>
+              </div>
+            )}
           </form>
 
           <div className="mt-8 pt-6 border-t border-sand-dark/50">

@@ -18,7 +18,8 @@
     "gentleReminderTitle": "תזכורת עדינה",
     "gentleReminder": "נא להזין אימייל וסיסמה.",
     "unableToSignIn": "לא ניתן להתחבר",
-    "checkCredentials": "נא לבדוק את פרטי ההתחברות ולנסות שוב."
+    "checkCredentials": "נא לבדוק את פרטי ההתחברות ולנסות שוב.",
+    "or": "או"
   },
   "dashboard": {
     "home": "בית",

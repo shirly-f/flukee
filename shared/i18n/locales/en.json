@@ -18,7 +18,8 @@
     "gentleReminderTitle": "Gentle reminder",
     "gentleReminder": "Please enter your email and password.",
     "unableToSignIn": "Unable to sign in",
-    "checkCredentials": "Please check your credentials and try again."
+    "checkCredentials": "Please check your credentials and try again.",
+    "or": "or"
   },
   "dashboard": {
     "home": "Home",
