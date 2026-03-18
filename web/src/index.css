@@ -45,9 +45,10 @@ body {
   background-color: var(--sand);
 }
 
-/* Headings - Frank Ruhl Libre (English), Heebo (Hebrew) */
+/* Headings - Assistant (English), Heebo (Hebrew) */
 .font-serif {
-  font-family: 'Frank Ruhl Libre', Georgia, serif;
+  font-family: 'Assistant', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 600;
 }
 
 [dir="rtl"] .font-serif,
@@ -58,8 +59,8 @@ body {
 }
 
 h1, h2, h3 {
-  font-family: 'Frank Ruhl Libre', Georgia, serif;
-  font-weight: 500;
+  font-family: 'Assistant', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 600;
   color: var(--charcoal);
   margin: 0;
 }
