@@ -1,5 +1,7 @@
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+try {
+  require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+} catch (_) {}
 
 // For physical device: set your computer's IP (e.g. '192.168.1.5')
 // For production/deployed backend: full URL (e.g. 'https://flukee-backend.onrender.com')
@@ -10,7 +12,11 @@ const API_BASE_URL = process.env.FLUKEE_API_BASE_URL || '';
 module.exports = {
   expo: {
     name: 'Flukee',
-    extra: { apiHost: API_HOST, apiBaseUrl: API_BASE_URL },
+    extra: {
+      apiHost: API_HOST,
+      apiBaseUrl: API_BASE_URL,
+      eas: { projectId: '86954142-9e2e-4691-8017-b76153a9931f' },
+    },
     slug: 'flukee-mobile',
     version: '1.0.0',
     orientation: 'portrait',

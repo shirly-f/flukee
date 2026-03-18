@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { authService } from '../services/authService';
-import api from '../services/api';
+import api, { API_BASE_URL } from '../services/api';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 export default function LoginPage() {
@@ -17,7 +17,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get('/health', { timeout: 15000 }).then(() => setBackendReachable(true)).catch(() => setBackendReachable(false));
+    api.get('/health', { timeout: 60000 }).then(() => setBackendReachable(true)).catch(() => setBackendReachable(false));
   }, []);
 
   const handleSubmit = async (e) => {
@@ -57,7 +57,13 @@ export default function LoginPage() {
 
           {backendReachable === false && (
             <div className="mb-6 p-4 bg-amber-100 border border-amber-300 rounded-2xl text-charcoal text-sm">
-              <strong>Backend unreachable.</strong> In Netlify → Site configuration → Environment variables, add <code className="bg-white/50 px-1 rounded">VITE_API_BASE_URL</code> = your Render backend URL (e.g. https://xxx.onrender.com). Then trigger a new deploy.
+              <strong>Backend unreachable.</strong> App is trying: <code className="bg-white/50 px-1 rounded break-all">{API_BASE_URL}</code>
+              {API_BASE_URL.includes('localhost') && (
+                <><br /><br />Set <code className="bg-white/50 px-1 rounded">VITE_API_BASE_URL</code> in Netlify env vars to <code className="bg-white/50 px-1 rounded">https://flukee-backend.onrender.com</code>, then trigger a new deploy.</>
+              )}
+              {!API_BASE_URL.includes('localhost') && (
+                <><br /><br />Backend may be starting (Render free tier sleeps; first request can take ~60s). Try again, or check <a href={API_BASE_URL + '/health'} target="_blank" rel="noopener noreferrer" className="text-sage underline">health endpoint</a> directly.</>
+              )}
             </div>
           )}
 
@@ -106,6 +112,19 @@ export default function LoginPage() {
               {loading ? t('login.signingIn') : t('login.signIn')}
             </button>
           </form>
+
+          <div className="mt-8 pt-6 border-t border-sand-dark/50">
+            <p className="text-charcoal-light text-sm font-medium mb-2">Get the app feel on your phone</p>
+            <p className="text-charcoal-light text-xs mb-2">
+              <strong>Option 1:</strong> On your phone, tap the browser menu (⋮ or Share) → <strong>Add to Home Screen</strong>. The site will open fullscreen like an app.
+            </p>
+            <p className="text-charcoal-light text-xs">
+              <strong>Option 2:</strong> Ask the developer for an APK link (Android) — a real installable app.
+            </p>
+            <p className="text-charcoal-light text-xs mt-2">
+              Login: <code className="bg-sand-dark/30 px-1 rounded">trainee@test.com</code> / <code className="bg-sand-dark/30 px-1 rounded">password</code>
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -45,9 +45,16 @@ body {
   background-color: var(--sand);
 }
 
-/* Headings - Frank Ruhl Libre */
+/* Headings - Frank Ruhl Libre (English), Heebo (Hebrew) */
 .font-serif {
   font-family: 'Frank Ruhl Libre', Georgia, serif;
+}
+
+[dir="rtl"] .font-serif,
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3 {
+  font-family: 'Heebo', 'Assistant', sans-serif;
 }
 
 h1, h2, h3 {
