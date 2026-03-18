@@ -16,7 +16,11 @@ function OAuthWrapper({ children }) {
     return () => i18n.off('languageChanged', handler);
   }, []);
   return (
-    <GoogleOAuthProvider clientId={googleClientId || 'dummy.apps.googleusercontent.com'} locale={locale}>
+    <GoogleOAuthProvider
+      key={locale}
+      clientId={googleClientId || 'dummy.apps.googleusercontent.com'}
+      locale={locale}
+    >
       {children}
     </GoogleOAuthProvider>
   );
