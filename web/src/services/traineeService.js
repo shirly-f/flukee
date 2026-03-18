@@ -6,9 +6,19 @@ export const traineeService = {
     return response.data.trainees;
   },
 
+  async addTrainee(email, domain) {
+    const response = await api.post('/api/coaches/trainees', { email, domain });
+    return response.data;
+  },
+
   async getMyCoach() {
     const response = await api.get('/api/trainees/coach');
     return response.data.coach;
+  },
+
+  async getMyCoaches() {
+    const response = await api.get('/api/trainees/coaches');
+    return response.data.coaches;
   },
 
   async getTraineeOverview(traineeId) {

@@ -19,7 +19,18 @@
     "gentleReminder": "נא להזין אימייל וסיסמה.",
     "unableToSignIn": "לא ניתן להתחבר",
     "checkCredentials": "נא לבדוק את פרטי ההתחברות ולנסות שוב.",
-    "or": "או"
+    "or": "או",
+    "invitedYou": "הזמין אותך ל-Flukee",
+    "focusArea": "תחום התמחות"
+  },
+  "coach": {
+    "addTrainee": "הוסף מתאמן",
+    "cancelAdd": "ביטול",
+    "addTraineeByEmail": "הוסף מתאמן לפי אימייל",
+    "domainLabel": "תחום התמחות (אופציונלי)",
+    "domainPlaceholder": "למשל כושר, תזונה, מיינדפולנס",
+    "inviteSent": "ההזמנה נשלחה ל־{{email}}",
+    "traineeAdded": "{{name}} נוסף לרשימת הלקוחות שלך"
   },
   "dashboard": {
     "home": "בית",

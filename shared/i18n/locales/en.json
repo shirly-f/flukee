@@ -19,7 +19,18 @@
     "gentleReminder": "Please enter your email and password.",
     "unableToSignIn": "Unable to sign in",
     "checkCredentials": "Please check your credentials and try again.",
-    "or": "or"
+    "or": "or",
+    "invitedYou": "invited you to Flukee",
+    "focusArea": "Focus area"
+  },
+  "coach": {
+    "addTrainee": "Add trainee",
+    "cancelAdd": "Cancel",
+    "addTraineeByEmail": "Add trainee by email",
+    "domainLabel": "Focus area (optional)",
+    "domainPlaceholder": "e.g. fitness, nutrition, mindfulness",
+    "inviteSent": "Invitation sent to {{email}}",
+    "traineeAdded": "{{name}} has been added to your clients"
   },
   "dashboard": {
     "home": "Home",

@@ -26,6 +26,7 @@ In Render → Your backend service → **Environment**:
 | Variable | Value |
 |----------|-------|
 | `GOOGLE_CLIENT_ID` | Your Google Client ID (e.g. `123456-xxx.apps.googleusercontent.com`) |
+| `APP_BASE_URL` | Frontend URL for invite links (e.g. `https://flukee-web.netlify.app`) |
 
 Redeploy the backend after adding the variable.
 

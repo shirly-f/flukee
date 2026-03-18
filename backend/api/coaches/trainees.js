@@ -5,6 +5,93 @@
  */
 
 import { db } from '../../db/index.js';
+import { sendInviteEmail } from '../../services/notifications.js';
+
+/**
+ * POST /api/coaches/trainees
+ * Add a trainee by email. If user exists, create relationship. If not, send invite.
+ */
+export const addTrainee = async (req, res) => {
+  try {
+    const { user } = req;
+    const { email, domain } = req.body;
+
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({
+        error: { code: 'VALIDATION_ERROR', message: 'email is required' },
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      return res.status(400).json({
+        error: { code: 'VALIDATION_ERROR', message: 'email is required' },
+      });
+    }
+
+    const trainee = db.users.findByEmail(normalizedEmail);
+
+    if (trainee) {
+      if (trainee.role !== 'trainee') {
+        return res.status(400).json({
+          error: { code: 'VALIDATION_ERROR', message: 'User is a coach, not a trainee' },
+        });
+      }
+
+      const existing = db.relationships.findPair(user.id, trainee.id);
+      if (existing) {
+        const { password: _, ...traineeSafe } = trainee;
+        return res.status(200).json({
+          relationship: existing,
+          trainee: traineeSafe,
+          invited: false,
+        });
+      }
+
+      const relationship = db.relationships.create({
+        coachId: user.id,
+        traineeId: trainee.id,
+        domain: domain || null,
+      });
+
+      const { password: _, ...traineeSafe } = trainee;
+      return res.status(201).json({
+        relationship,
+        trainee: traineeSafe,
+        invited: false,
+      });
+    }
+
+    // User doesn't exist - create pending invite
+    const existingInvite = db.pendingInvites.findByEmailAndCoach(normalizedEmail, user.id);
+    if (existingInvite) {
+      return res.status(200).json({
+        message: 'Invite already sent to this email',
+        invited: true,
+        email: normalizedEmail,
+      });
+    }
+
+    const invite = db.pendingInvites.create({
+      coachId: user.id,
+      email: normalizedEmail,
+      domain: domain || null,
+    });
+
+    await sendInviteEmail(invite, user);
+
+    return res.status(201).json({
+      message: 'Invitation sent',
+      invited: true,
+      email: normalizedEmail,
+    });
+  } catch (error) {
+    console.error('Add trainee error:', error);
+    res.status(500).json({
+      error: { code: 'SERVER_ERROR', message: 'Failed to add trainee' },
+    });
+  }
+};
 
 /**
  * GET /api/coaches/trainees

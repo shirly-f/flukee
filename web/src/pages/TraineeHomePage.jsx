@@ -10,17 +10,17 @@ export default function TraineeHomePage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [tasks, setTasks] = useState([]);
-  const [coach, setCoach] = useState(null);
+  const [coaches, setCoaches] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
     try {
-      const [tasksData, coachData] = await Promise.all([
+      const [tasksData, coachesData] = await Promise.all([
         taskService.listTasksForTrainee().catch(() => []),
-        traineeService.getMyCoach().catch(() => null),
+        traineeService.getMyCoaches().catch(() => []),
       ]);
       setTasks(Array.isArray(tasksData) ? tasksData : []);
-      setCoach(coachData || null);
+      setCoaches(Array.isArray(coachesData) ? coachesData : []);
     } catch (error) {
       console.error('Failed to load data:', error);
       setTasks([]);

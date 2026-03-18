@@ -92,6 +92,35 @@ sqlite.exec(`
   );
 `);
 
+// Migration: add domain to relationships, UNIQUE on (coachId, traineeId), pending_invites
+(function migrate() {
+  try {
+    const hasDomain = sqlite.prepare("PRAGMA table_info(relationships)").all().some(c => c.name === 'domain');
+    if (!hasDomain) {
+      sqlite.exec('ALTER TABLE relationships ADD COLUMN domain TEXT');
+    }
+    sqlite.exec(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_relationships_pair
+      ON relationships(coachId, traineeId) WHERE status = 'active'
+    `);
+  } catch (_) {}
+})();
+
+sqlite.exec(`
+  CREATE TABLE IF NOT EXISTS pending_invites (
+    id TEXT PRIMARY KEY,
+    coachId TEXT NOT NULL,
+    email TEXT NOT NULL,
+    token TEXT UNIQUE NOT NULL,
+    domain TEXT,
+    status TEXT DEFAULT 'pending',
+    createdAt TEXT,
+    FOREIGN KEY (coachId) REFERENCES users(id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_pending_invites_token ON pending_invites(token);
+  CREATE INDEX IF NOT EXISTS idx_pending_invites_email ON pending_invites(email);
+`);
+
 function generateId(prefix = '') {
   return `${prefix}${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
@@ -242,12 +271,17 @@ export const db = {
 
   relationships: {
     create(relationshipData) {
+      const existing = db.relationships.findPair(relationshipData.coachId, relationshipData.traineeId);
+      if (existing) return existing;
+
       const id = relationshipData.id || generateId('rel_');
+      const now = new Date().toISOString();
+      const domain = relationshipData.domain || null;
       sqlite.prepare(`
-        INSERT INTO relationships (id, coachId, traineeId, status, createdAt)
-        VALUES (?, ?, ?, ?, ?)
-      `).run(id, relationshipData.coachId, relationshipData.traineeId, relationshipData.status || 'active', new Date().toISOString());
-      return { id, coachId: relationshipData.coachId, traineeId: relationshipData.traineeId, status: 'active', createdAt: new Date().toISOString() };
+        INSERT INTO relationships (id, coachId, traineeId, status, domain, createdAt)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).run(id, relationshipData.coachId, relationshipData.traineeId, relationshipData.status || 'active', domain, now);
+      return { id, coachId: relationshipData.coachId, traineeId: relationshipData.traineeId, status: 'active', domain, createdAt: now };
     },
 
     findByCoachId(coachId) {
@@ -255,11 +289,36 @@ export const db = {
     },
 
     findByTraineeId(traineeId) {
-      return sqlite.prepare('SELECT * FROM relationships WHERE traineeId = ? AND status = ?').get(traineeId, 'active') || null;
+      return sqlite.prepare('SELECT * FROM relationships WHERE traineeId = ? AND status = ?').all(traineeId, 'active');
     },
 
     findPair(coachId, traineeId) {
       return sqlite.prepare('SELECT * FROM relationships WHERE coachId = ? AND traineeId = ? AND status = ?').get(coachId, traineeId, 'active') || null;
+    },
+  },
+
+  pendingInvites: {
+    create(inviteData) {
+      const id = inviteData.id || generateId('inv_');
+      const token = inviteData.token || `inv_${Date.now()}_${Math.random().toString(36).slice(2, 15)}`;
+      const now = new Date().toISOString();
+      sqlite.prepare(`
+        INSERT INTO pending_invites (id, coachId, email, token, domain, status, createdAt)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).run(id, inviteData.coachId, inviteData.email, token, inviteData.domain || null, inviteData.status || 'pending', now);
+      return { id, coachId: inviteData.coachId, email: inviteData.email, token, domain: inviteData.domain, status: 'pending', createdAt: now };
+    },
+
+    findByToken(token) {
+      return sqlite.prepare('SELECT * FROM pending_invites WHERE token = ? AND status = ?').get(token, 'pending') || null;
+    },
+
+    findByEmailAndCoach(email, coachId) {
+      return sqlite.prepare('SELECT * FROM pending_invites WHERE email = ? AND coachId = ? AND status = ?').get(email, coachId, 'pending') || null;
+    },
+
+    markUsed(token) {
+      sqlite.prepare('UPDATE pending_invites SET status = ? WHERE token = ?').run('used', token);
     },
   },
 

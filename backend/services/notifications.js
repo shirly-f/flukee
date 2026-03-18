@@ -94,6 +94,26 @@ export async function notifyTraineeTaskAssigned(task, coach, trainee) {
 }
 
 /**
+ * Send coach invite email to trainee
+ * @param {Object} invite - { email, token, domain }
+ * @param {Object} coach - { name }
+ */
+export async function sendInviteEmail(invite, coach) {
+  const appUrl = process.env.APP_BASE_URL || process.env.FRONTEND_URL || 'https://flukee-web.netlify.app';
+  const inviteLink = `${appUrl}/login?invite=${invite.token}`;
+  const subject = `${coach.name} invited you to Flukee`;
+  const domainLine = invite.domain ? `<p>Focus area: ${invite.domain}</p>` : '';
+  const html = `
+    <p>Hi,</p>
+    <p>${coach.name} has invited you to join Flukee — a space for reflection and practices.</p>
+    ${domainLine}
+    <p><a href="${inviteLink}" style="display:inline-block;padding:12px 24px;background:#6b9080;color:white;text-decoration:none;border-radius:8px;">Accept invitation</a></p>
+    <p>Or copy this link: ${inviteLink}</p>
+  `;
+  return sendEmail(invite.email, subject, html);
+}
+
+/**
  * Notify coach: trainee completed a task
  */
 export async function notifyCoachTaskCompleted(task, coach, trainee) {

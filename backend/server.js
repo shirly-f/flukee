@@ -8,10 +8,10 @@ import { uploadDocument, uploadErrorHandler } from './api/upload.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { listTasks, getTaskDetails as getTraineeTaskDetails, submitTaskResponse, updateTaskStatus } from './api/trainees/tasks.js';
-import { getMyCoach } from './api/trainees/coach.js';
-import { listTrainees, getTraineeOverview, getTraineeTasks } from './api/coaches/trainees.js';
+import { getMyCoach, getMyCoaches } from './api/trainees/coach.js';
+import { listTrainees, getTraineeOverview, getTraineeTasks, addTrainee } from './api/coaches/trainees.js';
 import { getMessages, sendMessage } from './api/messages/index.js';
-import { login, register, getCurrentUser } from './api/auth.js';
+import { login, register, getCurrentUser, getInvitePreview } from './api/auth.js';
 import { googleSignIn } from './api/authGoogle.js';
 import { registerPushToken } from './api/users/pushToken.js';
 import { seedDatabase } from './db/index.js';
@@ -37,10 +37,12 @@ app.get('/health', (req, res) => {
 app.post('/auth/login', login);
 app.post('/auth/register', register);
 app.post('/auth/google', googleSignIn);
+app.get('/auth/invite/:token', getInvitePreview);
 app.get('/auth/me', authenticate, getCurrentUser);
 
 // Coach routes
 app.get('/api/coaches/trainees', authenticate, requireRole('coach'), listTrainees);
+app.post('/api/coaches/trainees', authenticate, requireRole('coach'), addTrainee);
 app.get('/api/coaches/trainees/:traineeId', authenticate, requireRole('coach'), getTraineeOverview);
 app.get('/api/coaches/trainees/:traineeId/tasks', authenticate, requireRole('coach'), getTraineeTasks);
 app.post('/api/upload', authenticate, requireRole('coach'), ...uploadDocument, uploadErrorHandler);
@@ -52,6 +54,7 @@ const traineeRouter = express.Router();
 traineeRouter.use(authenticate);
 traineeRouter.use(requireRole('trainee'));
 traineeRouter.get('/coach', getMyCoach);
+traineeRouter.get('/coaches', getMyCoaches);
 traineeRouter.get('/tasks', listTasks);
 traineeRouter.get('/tasks/:taskId', getTraineeTaskDetails);
 traineeRouter.post('/tasks/:taskId/response', submitTaskResponse);

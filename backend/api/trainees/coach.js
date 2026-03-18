@@ -1,13 +1,13 @@
 /**
  * Trainee Coach API
- * Get the trainee's assigned coach for messaging and preview
+ * Get the trainee's assigned coach(es) for messaging and preview
  */
 
 import { db } from '../../db/index.js';
 
 /**
  * GET /api/trainees/coach
- * Get the current trainee's assigned coach
+ * Get the current trainee's first coach (backwards compatible)
  */
 export const getMyCoach = async (req, res) => {
   try {
@@ -22,17 +22,12 @@ export const getMyCoach = async (req, res) => {
       });
     }
 
-    const relationship = db.relationships.findByTraineeId(user.id);
+    const relationships = db.relationships.findByTraineeId(user.id);
+    const first = relationships[0];
+    if (!first) return res.json({ coach: null });
 
-    if (!relationship) {
-      return res.json({ coach: null });
-    }
-
-    const coach = db.users.findById(relationship.coachId);
-
-    if (!coach) {
-      return res.json({ coach: null });
-    }
+    const coach = db.users.findById(first.coachId);
+    if (!coach) return res.json({ coach: null });
 
     const { password: _, ...coachWithoutPassword } = coach;
     res.json({ coach: coachWithoutPassword });
@@ -42,6 +37,45 @@ export const getMyCoach = async (req, res) => {
       error: {
         code: 'SERVER_ERROR',
         message: 'Failed to fetch coach',
+      },
+    });
+  }
+};
+
+/**
+ * GET /api/trainees/coaches
+ * Get all coaches assigned to the trainee
+ */
+export const getMyCoaches = async (req, res) => {
+  try {
+    const { user } = req;
+
+    if (user.role !== 'trainee') {
+      return res.status(403).json({
+        error: {
+          code: 'FORBIDDEN',
+          message: 'Only trainees can access their coaches',
+        },
+      });
+    }
+
+    const relationships = db.relationships.findByTraineeId(user.id);
+    const coaches = relationships
+      .map((rel) => {
+        const coach = db.users.findById(rel.coachId);
+        if (!coach) return null;
+        const { password: _, ...safe } = coach;
+        return { ...safe, domain: rel.domain };
+      })
+      .filter(Boolean);
+
+    res.json({ coaches });
+  } catch (error) {
+    console.error('Get coaches error:', error);
+    res.status(500).json({
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Failed to fetch coaches',
       },
     });
   }

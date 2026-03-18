@@ -9,14 +9,29 @@ import { generateToken } from '../middleware/auth.js';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+function redeemInviteIfProvided(userId, inviteToken) {
+  if (!inviteToken || typeof inviteToken !== 'string') return;
+  const invite = db.pendingInvites.findByToken(inviteToken.trim());
+  if (!invite) return;
+  const trainee = db.users.findById(userId);
+  if (!trainee || trainee.role !== 'trainee') return;
+  if (trainee.email.toLowerCase() !== invite.email.toLowerCase()) return;
+  db.relationships.create({
+    coachId: invite.coachId,
+    traineeId: userId,
+    domain: invite.domain,
+  });
+  db.pendingInvites.markUsed(invite.token);
+}
+
 /**
  * POST /auth/google
- * Body: { idToken: string, role?: 'coach'|'trainee' }
+ * Body: { idToken: string, role?: 'coach'|'trainee', inviteToken?: string }
  * For new users, role defaults to 'trainee'
  */
 export const googleSignIn = async (req, res) => {
   try {
-    const { idToken, role = 'trainee' } = req.body;
+    const { idToken, role = 'trainee', inviteToken } = req.body;
 
     if (!idToken) {
       return res.status(400).json({
@@ -55,6 +70,8 @@ export const googleSignIn = async (req, res) => {
         password: null,
       });
     }
+
+    redeemInviteIfProvided(user.id, inviteToken);
 
     const token = generateToken(user.id);
     const { password: _, ...userWithoutPassword } = user;

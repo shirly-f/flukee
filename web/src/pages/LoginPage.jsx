@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../hooks/useAuth';
@@ -16,6 +16,16 @@ export default function LoginPage() {
   const [backendReachable, setBackendReachable] = useState(null);
   const { login, setSession } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const inviteToken = searchParams.get('invite') || undefined;
+  const [invitePreview, setInvitePreview] = useState(null);
+
+  useEffect(() => {
+    if (!inviteToken) return;
+    api.get(`/auth/invite/${inviteToken}`)
+      .then((r) => setInvitePreview(r.data))
+      .catch(() => setInvitePreview(null));
+  }, [inviteToken]);
 
   const handleGoogleSuccess = async (credentialResponse) => {
     if (!credentialResponse?.credential) return;
@@ -25,6 +35,7 @@ export default function LoginPage() {
       const authRes = await api.post('/auth/google', {
         idToken: credentialResponse.credential,
         role: 'trainee',
+        inviteToken,
       });
       const data = authRes.data;
       setSession(data.token, data.user);
@@ -50,7 +61,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await login(email, password);
+      const res = await login(email, password, inviteToken);
       navigate(res.user?.role === 'trainee' ? '/my-tasks' : '/trainees');
     } catch (err) {
       if (!err.response) {
@@ -78,6 +89,17 @@ export default function LoginPage() {
               {t('login.subtitle')}
             </p>
           </div>
+
+          {invitePreview && (
+            <div className="mb-6 p-4 bg-sage/10 border border-sage/30 rounded-2xl text-charcoal text-sm">
+              <strong>{invitePreview.coachName}</strong> {t('login.invitedYou')}
+              {invitePreview.domain && (
+                <span className="block mt-1 text-charcoal-light">
+                  {t('login.focusArea')}: {invitePreview.domain}
+                </span>
+              )}
+            </div>
+          )}
 
           {backendReachable === false && (
             <div className="mb-6 p-4 bg-amber-100 border border-amber-300 rounded-2xl text-charcoal text-sm">
