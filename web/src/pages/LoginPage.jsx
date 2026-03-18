@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { authService } from '../services/authService';
+import api from '../services/api';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 export default function LoginPage() {
@@ -11,8 +12,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [backendReachable, setBackendReachable] = useState(null);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    api.get('/health', { timeout: 15000 }).then(() => setBackendReachable(true)).catch(() => setBackendReachable(false));
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +29,11 @@ export default function LoginPage() {
       const res = await login(email, password);
       navigate(res.user?.role === 'trainee' ? '/my-tasks' : '/trainees');
     } catch (err) {
-      setError(err.response?.data?.error?.message || t('login.checkCredentials'));
+      if (!err.response) {
+        setError('Cannot reach the server. Set VITE_API_BASE_URL in Netlify to your Render backend URL.');
+      } else {
+        setError(err.response?.data?.error?.message || t('login.checkCredentials'));
+      }
     } finally {
       setLoading(false);
     }
@@ -44,6 +54,12 @@ export default function LoginPage() {
               {t('login.subtitle')}
             </p>
           </div>
+
+          {backendReachable === false && (
+            <div className="mb-6 p-4 bg-amber-100 border border-amber-300 rounded-2xl text-charcoal text-sm">
+              <strong>Backend unreachable.</strong> In Netlify → Site configuration → Environment variables, add <code className="bg-white/50 px-1 rounded">VITE_API_BASE_URL</code> = your Render backend URL (e.g. https://xxx.onrender.com). Then trigger a new deploy.
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
