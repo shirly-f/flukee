@@ -136,16 +136,16 @@ export default function LoginPage() {
               {loading ? t('login.signingIn') : t('login.signIn')}
             </button>
 
-            {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
-              <div className="mt-6">
-                <div className="relative my-4">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-sand-dark" />
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-cream text-charcoal-light">{t('login.or')}</span>
-                  </div>
+            <div className="mt-6">
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-sand-dark" />
                 </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-cream text-charcoal-light">{t('login.or')}</span>
+                </div>
+              </div>
+              {import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
                 <div className="flex justify-center">
                   <GoogleLogin
                     onSuccess={handleGoogleSuccess}
@@ -157,8 +157,12 @@ export default function LoginPage() {
                     shape="rectangular"
                   />
                 </div>
-              </div>
-            )}
+              ) : (
+                <p className="text-center text-charcoal-light text-sm">
+                  {t('login.googleNotConfigured')}
+                </p>
+              )}
+            </div>
           </form>
 
           <div className="mt-8 pt-6 border-t border-sand-dark/50">
