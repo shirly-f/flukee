@@ -2,46 +2,81 @@
  * Notification Service
  * Sends email and push notifications for task events
  *
- * Configure via env:
- * - SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, MAIL_FROM - for email
- * - If not set, emails are logged to console
+ * Email - use ONE of these:
+ * 1. Resend (recommended): RESEND_API_KEY - just add the key, works out of the box
+ * 2. SMTP: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, MAIL_FROM
+ * If neither is set, emails are logged to console only
  */
 
 import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { Expo } from 'expo-server-sdk';
 import { db } from '../db/index.js';
 
 const expo = new Expo();
 
-// Email transporter - use env or create a no-op for dev
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
+
+// Resend: use onboarding@resend.dev for testing (no domain verify). Or set MAIL_FROM to your verified domain.
+const resendFrom = process.env.MAIL_FROM || 'Flukee <onboarding@resend.dev>';
+
+// SMTP transporter - fallback if Resend not used
 function getTransporter() {
   const host = process.env.SMTP_HOST;
-  const port = process.env.SMTP_PORT || 587;
+  const port = Number(process.env.SMTP_PORT) || 587;
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
   if (host && user && pass) {
+    console.log('[SMTP] Configured:', host, 'port', port, 'user', user);
     return nodemailer.createTransport({ host, port, secure: port === 465, auth: { user, pass } });
   }
   return null;
 }
 
-const transporter = getTransporter();
-const mailFrom = process.env.MAIL_FROM || 'noreply@flukee.app';
+const smtpTransporter = getTransporter();
+const smtpFrom = process.env.MAIL_FROM || process.env.SMTP_USER || 'noreply@flukee.app';
+
+if (resend) {
+  console.log('[Email] Using Resend. From:', resendFrom);
+} else if (!smtpTransporter) {
+  console.log('[Email] Not configured. Add RESEND_API_KEY (recommended) or SMTP_* env vars. Emails will be logged only.');
+}
 
 /**
- * Send email - uses SMTP if configured, otherwise logs
+ * Send email - uses Resend if configured, else SMTP, else logs
  */
 export async function sendEmail(to, subject, html) {
-  if (transporter) {
+  if (resend) {
     try {
-      await transporter.sendMail({ from: mailFrom, to, subject, html });
+      const { data, error } = await resend.emails.send({
+        from: resendFrom,
+        to,
+        subject,
+        html,
+      });
+      if (error) {
+        console.error('[Email] Resend failed to', to, error.message);
+        return false;
+      }
+      console.log('[Email] Sent via Resend to', to);
       return true;
     } catch (err) {
-      console.error('Email send error:', err);
+      console.error('[Email] Resend error to', to, err.message || err);
       return false;
     }
   }
-  console.log('[Email]', { to, subject, html: html?.slice(0, 100) + '...' });
+  if (smtpTransporter) {
+    try {
+      await smtpTransporter.sendMail({ from: smtpFrom, to, subject, html });
+      console.log('[Email] Sent via SMTP to', to);
+      return true;
+    } catch (err) {
+      console.error('[Email] SMTP failed to', to, err.message || err);
+      return false;
+    }
+  }
+  console.log('[Email] (not sent, no provider configured)', { to, subject, html: html?.slice(0, 80) + '...' });
   return true;
 }
 
