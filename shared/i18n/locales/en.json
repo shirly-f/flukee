@@ -163,7 +163,8 @@
     "subtitleTrainee": "A calm space to message your coach.",
     "selectCoach": "Select a coach to view the conversation",
     "noCoachForMessages": "When a coach adds you as a client, you can message them here.",
-    "yourCoaches": "Your coaches"
+    "yourCoaches": "Your coaches",
+    "unreadBadge": "{{count}} unread from this client"
   },
   "progress": {
     "ofCompleted": "of {{total}} completed",

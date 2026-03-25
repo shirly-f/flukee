@@ -340,6 +340,25 @@ export const db = {
         ORDER BY createdAt ASC
       `).all(userId1, userId2, userId2, userId1);
     },
+
+    /** Unread messages received by receiverId, sent by senderId (SQLite: read = 0) */
+    countUnreadForReceiver(receiverId, senderId) {
+      const row = sqlite.prepare(`
+        SELECT COUNT(*) as c FROM messages
+        WHERE receiverId = ? AND senderId = ? AND read = 0
+      `).get(receiverId, senderId);
+      return row?.c ?? 0;
+    },
+
+    /** Mark all messages TO receiverId FROM senderId as read */
+    markConversationReadForReceiver(receiverId, senderId) {
+      const now = new Date().toISOString();
+      const result = sqlite.prepare(`
+        UPDATE messages SET read = 1, readAt = ?
+        WHERE receiverId = ? AND senderId = ? AND read = 0
+      `).run(now, receiverId, senderId);
+      return result.changes;
+    },
   },
 
   pushTokens: {

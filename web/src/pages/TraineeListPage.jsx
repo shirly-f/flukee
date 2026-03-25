@@ -230,8 +230,17 @@ export default function TraineeListPage() {
                 >
                   <div className="flex justify-between items-center">
                     <div>
-                      <h3 className="font-serif text-xl font-semibold text-charcoal mb-1">
+                      <h3 className="font-serif text-xl font-semibold text-charcoal mb-1 flex items-center gap-2 flex-wrap">
                         {trainee.name}
+                        {(trainee.unreadMessageCount ?? 0) > 0 && (
+                          <span
+                            className="inline-flex items-center justify-center min-w-[1.5rem] h-6 px-1.5 rounded-full bg-rose text-cream text-xs font-semibold tabular-nums"
+                            title={t('messages.unreadBadge', { count: trainee.unreadMessageCount })}
+                            aria-label={t('messages.unreadBadge', { count: trainee.unreadMessageCount })}
+                          >
+                            {trainee.unreadMessageCount}
+                          </span>
+                        )}
                       </h3>
                       <p className="text-charcoal-light text-sm">{statusText}</p>
                     </div>

@@ -125,12 +125,15 @@ export const listTrainees = async (req, res) => {
       const activeTasks = tasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length;
       const completedTasks = tasks.filter(t => t.status === 'completed').length;
 
+      const unreadMessageCount = db.messages.countUnreadForReceiver(user.id, traineeId);
+
       return {
         id: trainee.id,
         name: trainee.name,
         email: trainee.email,
         activeTasks,
         completedTasks,
+        unreadMessageCount,
         lastActive: new Date().toISOString(), // TODO: Track actual last active
       };
     }).filter(Boolean);

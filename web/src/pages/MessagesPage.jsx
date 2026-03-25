@@ -31,6 +31,8 @@ export default function MessagesPage() {
     try {
       const data = await messageService.getMessages(traineeId);
       setMessages(data);
+      const fresh = await traineeService.listTrainees();
+      setTrainees(fresh);
     } catch (error) {
       console.error('Failed to load messages:', error);
     } finally {
@@ -74,7 +76,18 @@ export default function MessagesPage() {
                     : 'hover:bg-sand/30'
                 }`}
               >
-                <p className="font-medium text-charcoal">{trainee.name}</p>
+                <p className="font-medium text-charcoal flex items-center gap-2 flex-wrap">
+                  {trainee.name}
+                  {(trainee.unreadMessageCount ?? 0) > 0 && (
+                    <span
+                      className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full bg-rose text-cream text-[11px] font-semibold tabular-nums"
+                      title={t('messages.unreadBadge', { count: trainee.unreadMessageCount })}
+                      aria-label={t('messages.unreadBadge', { count: trainee.unreadMessageCount })}
+                    >
+                      {trainee.unreadMessageCount}
+                    </span>
+                  )}
+                </p>
                 <p className="text-charcoal-light text-sm">{trainee.email}</p>
               </button>
             ))}

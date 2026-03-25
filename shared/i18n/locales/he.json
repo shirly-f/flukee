@@ -163,7 +163,8 @@
     "subtitleTrainee": "מרחב שקט להודעות למאמן.",
     "selectCoach": "בחרו מאמן כדי לראות את השיחה",
     "noCoachForMessages": "כשמאמן מוסיף אתכם כלקוחות, תוכלו לשלוח לו הודעות כאן.",
-    "yourCoaches": "המאמנים שלכם"
+    "yourCoaches": "המאמנים שלכם",
+    "unreadBadge": "{{count}} הודעות חדשות מהמתאמן"
   },
   "progress": {
     "ofCompleted": "מתוך {{total}} הושלמו",

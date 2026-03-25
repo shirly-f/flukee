@@ -49,7 +49,8 @@ export const getMessages = async (req, res) => {
     }
 
     const messages = db.messages.findConversation(user.id, otherUserId);
-    
+    db.messages.markConversationReadForReceiver(user.id, otherUserId);
+
     res.json({ messages });
   } catch (error) {
     console.error('Get messages error:', error);
