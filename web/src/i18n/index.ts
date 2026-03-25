@@ -48,20 +48,22 @@ i18n.use(initReactI18next).init({
 
 updateDocumentDirection(initialLang);
 
-const updateDocumentTitle = () => {
+/** Base tab title only. Role-specific suffix is set from AuthContext when logged in. */
+export const applyBaseDocumentTitle = () => {
   if (typeof document !== 'undefined') {
-    document.title = `${i18n.t('login.title')} - ${i18n.t('dashboard.coachDashboard')}`;
+    document.title = i18n.t('login.title');
   }
 };
 
-updateDocumentTitle();
+applyBaseDocumentTitle();
 
 i18n.on('languageChanged', (lng) => {
   if (typeof window !== 'undefined') {
     localStorage.setItem(LANGUAGE_STORAGE_KEY, lng);
   }
   updateDocumentDirection(lng);
-  updateDocumentTitle();
+  applyBaseDocumentTitle();
+  window.dispatchEvent(new CustomEvent('flukee:languageChanged'));
 });
 
 export default i18n;

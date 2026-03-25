@@ -46,6 +46,7 @@
   "dashboard": {
     "home": "Home",
     "coachDashboard": "Coach Dashboard",
+    "traineeDashboard": "My practices",
     "welcome": "Welcome back",
     "peopleInCare": "People in your care",
     "activePractices": "Active practices",
