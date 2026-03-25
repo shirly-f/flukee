@@ -31,6 +31,23 @@
     "fillNamePassword": "Please enter your name and password.",
     "googleSameEmail": "With Google, use the same email address as on this invitation."
   },
+  "registerCoach": {
+    "title": "Create your coach account",
+    "subtitle": "Manage clients, practices, and invitations from one place.",
+    "confirmPassword": "Confirm password",
+    "passwordHint": "Use at least {{min}} characters.",
+    "submit": "Create coach account",
+    "fillAll": "Please fill in all fields.",
+    "passwordTooShort": "Password must be at least {{min}} characters.",
+    "passwordMismatch": "Passwords do not match.",
+    "googleFailed": "Google sign-in failed. Try again or use email and password.",
+    "googleNote": "Uses your Google account as a coach account on first sign-in.",
+    "haveAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "traineeHint": "Were you invited by a coach? Use the link from your invitation or sign in below — do not use this page.",
+    "coachCta": "Coaching others on Flukee?",
+    "linkLabel": "Create a coach account"
+  },
   "coach": {
     "addTrainee": "Add trainee",
     "cancelAdd": "Cancel",

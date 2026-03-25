@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../hooks/useAuth';
@@ -270,6 +270,15 @@ export default function LoginPage() {
               </div>
             )}
           </form>
+
+          {!inviteToken && (
+            <p className="text-center text-charcoal text-sm mt-8">
+              {t('registerCoach.coachCta')}{' '}
+              <Link to="/register/coach" className="text-sage font-medium hover:underline">
+                {t('registerCoach.linkLabel')}
+              </Link>
+            </p>
+          )}
 
           <div className="mt-8 pt-6 border-t border-sand-dark/50">
             <p className="text-charcoal-light text-sm font-medium mb-2">Get the app feel on your phone</p>

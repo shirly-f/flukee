@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './hooks/useAuth';
 import LoginPage from './pages/LoginPage';
+import RegisterCoachPage from './pages/RegisterCoachPage';
 import TraineeListPage from './pages/TraineeListPage';
 import TraineeOverviewPage from './pages/TraineeOverviewPage';
 import CreateTaskPage from './pages/CreateTaskPage';
@@ -61,6 +62,7 @@ function App() {
     <AuthProvider>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register/coach" element={<RegisterCoachPage />} />
         <Route
           path="/trainees"
           element={

@@ -95,6 +95,15 @@ export const register = async (req, res) => {
       });
     }
 
+    if (typeof password !== 'string' || password.length < 8) {
+      return res.status(400).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Password must be at least 8 characters'
+        }
+      });
+    }
+
     // Check if user already exists
     const existingUser = db.users.findByEmail(email);
     if (existingUser) {
