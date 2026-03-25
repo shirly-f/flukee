@@ -18,7 +18,13 @@ export default function TraineeLayout({ children }) {
             >
               {t('login.title')}
             </Link>
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-6 md:gap-8">
+              <Link
+                to="/my-messages"
+                className="text-charcoal-light text-sm hover:text-sage transition-colors duration-300"
+              >
+                {t('messages.messages')}
+              </Link>
               <span className="text-charcoal-light text-sm">{user?.name}</span>
               <button
                 onClick={logout}

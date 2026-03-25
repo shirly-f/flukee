@@ -10,6 +10,7 @@ import CreateTaskPage from './pages/CreateTaskPage';
 import MessagesPage from './pages/MessagesPage';
 import TraineeHomePage from './pages/TraineeHomePage';
 import TraineeTaskDetailPage from './pages/TraineeTaskDetailPage';
+import TraineeMessagesPage from './pages/TraineeMessagesPage';
 
 function PrivateRoute({ children }) {
   const { t } = useTranslation();
@@ -100,6 +101,14 @@ function App() {
           element={
             <TraineeRoute>
               <TraineeHomePage />
+            </TraineeRoute>
+          }
+        />
+        <Route
+          path="/my-messages"
+          element={
+            <TraineeRoute>
+              <TraineeMessagesPage />
             </TraineeRoute>
           }
         />

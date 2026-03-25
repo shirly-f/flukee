@@ -52,6 +52,16 @@ export default function TraineeHomePage() {
         <h1 className="font-serif text-4xl font-semibold text-charcoal">
           {user?.name || t('dashboard.friend')}
         </h1>
+        {coaches.length > 0 && (
+          <p className="mt-4">
+            <Link
+              to="/my-messages"
+              className="text-sage font-medium hover:underline text-base"
+            >
+              {t('messages.messageYourCoach')}
+            </Link>
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">

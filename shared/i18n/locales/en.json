@@ -159,7 +159,11 @@
     "with": "with",
     "guideAwaits": "Your guide awaits",
     "guideAwaitsMessage": "Once you're connected with a coach, you'll have a sacred space here for reflection and support.",
-    "beginConversationMessage": "Send a gentle message to your coach. This space is for reflection, guidance, and support."
+    "beginConversationMessage": "Send a gentle message to your coach. This space is for reflection, guidance, and support.",
+    "subtitleTrainee": "A calm space to message your coach.",
+    "selectCoach": "Select a coach to view the conversation",
+    "noCoachForMessages": "When a coach adds you as a client, you can message them here.",
+    "yourCoaches": "Your coaches"
   },
   "progress": {
     "ofCompleted": "of {{total}} completed",
