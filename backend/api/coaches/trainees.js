@@ -7,6 +7,11 @@
 import { db } from '../../db/index.js';
 import { sendInviteEmail } from '../../services/notifications.js';
 
+function buildInviteLink(token) {
+  const appUrl = process.env.APP_BASE_URL || process.env.FRONTEND_URL || 'https://flukee-web.netlify.app';
+  return `${appUrl}/login?invite=${token}`;
+}
+
 /**
  * POST /api/coaches/trainees
  * Add a trainee by email. If user exists, create relationship. If not, send invite.
@@ -62,28 +67,35 @@ export const addTrainee = async (req, res) => {
       });
     }
 
-    // User doesn't exist - create pending invite
-    const existingInvite = db.pendingInvites.findByEmailAndCoach(normalizedEmail, user.id);
-    if (existingInvite) {
-      return res.status(200).json({
-        message: 'Invite already sent to this email',
-        invited: true,
+    // User doesn't exist - create or reuse pending invite
+    let invite = db.pendingInvites.findByEmailAndCoach(normalizedEmail, user.id);
+    if (!invite) {
+      invite = db.pendingInvites.create({
+        coachId: user.id,
         email: normalizedEmail,
+        domain: domain || null,
       });
     }
 
-    const invite = db.pendingInvites.create({
-      coachId: user.id,
-      email: normalizedEmail,
-      domain: domain || null,
-    });
-
-    await sendInviteEmail(invite, user);
+    const inviteLink = buildInviteLink(invite.token);
+    const emailSent = await sendInviteEmail(invite, user);
+    if (!emailSent) {
+      return res.status(201).json({
+        message:
+          'Invite saved but email did not send. Share the invite link below manually (e.g. WhatsApp). Check Render logs and Resend. Remove MAIL_FROM in Render unless the domain is verified in Resend.',
+        invited: true,
+        email: normalizedEmail,
+        emailDelivered: false,
+        inviteLink,
+      });
+    }
 
     return res.status(201).json({
       message: 'Invitation sent',
       invited: true,
       email: normalizedEmail,
+      emailDelivered: true,
+      inviteLink,
     });
   } catch (error) {
     console.error('Add trainee error:', error);

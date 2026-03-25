@@ -47,28 +47,30 @@ if (resend) {
  * Send email - uses Resend if configured, else SMTP, else logs
  */
 export async function sendEmail(to, subject, html) {
+  const toList = Array.isArray(to) ? to : [to];
   if (resend) {
     try {
       const { data, error } = await resend.emails.send({
         from: resendFrom,
-        to,
+        to: toList,
         subject,
         html,
       });
       if (error) {
-        console.error('[Email] Resend failed to', to, error.message);
+        const msg = typeof error === 'object' ? JSON.stringify(error) : String(error);
+        console.error('[Email] Resend failed to', toList, msg);
         return false;
       }
-      console.log('[Email] Sent via Resend to', to);
+      console.log('[Email] Sent via Resend to', toList, 'id', data?.id);
       return true;
     } catch (err) {
-      console.error('[Email] Resend error to', to, err.message || err);
+      console.error('[Email] Resend error to', toList, err.message || err);
       return false;
     }
   }
   if (smtpTransporter) {
     try {
-      await smtpTransporter.sendMail({ from: smtpFrom, to, subject, html });
+      await smtpTransporter.sendMail({ from: smtpFrom, to: toList[0], subject, html });
       console.log('[Email] Sent via SMTP to', to);
       return true;
     } catch (err) {

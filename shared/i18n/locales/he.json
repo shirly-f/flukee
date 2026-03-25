@@ -30,6 +30,9 @@
     "domainLabel": "תחום התמחות (אופציונלי)",
     "domainPlaceholder": "למשל כושר, תזונה, מיינדפולנס",
     "inviteSent": "ההזמנה נשלחה ל־{{email}}",
+    "shareLinkBelow": "אפשר גם לשתף את הקישור הזה אם המייל לא מגיע:",
+    "inviteLinkLabel": "קישור הרשמה למתאמן",
+    "copyInviteLink": "העתק קישור",
     "traineeAdded": "{{name}} נוסף לרשימת הלקוחות שלך"
   },
   "dashboard": {

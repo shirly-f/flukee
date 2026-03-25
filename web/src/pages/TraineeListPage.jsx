@@ -16,6 +16,8 @@ export default function TraineeListPage() {
   const [addLoading, setAddLoading] = useState(false);
   const [addError, setAddError] = useState('');
   const [addSuccess, setAddSuccess] = useState('');
+  const [addSuccessWarning, setAddSuccessWarning] = useState(false);
+  const [lastInviteLink, setLastInviteLink] = useState('');
 
   useEffect(() => {
     loadTrainees();
@@ -37,11 +39,22 @@ export default function TraineeListPage() {
     if (!addEmail.trim()) return;
     setAddError('');
     setAddSuccess('');
+    setAddSuccessWarning(false);
+    setLastInviteLink('');
     setAddLoading(true);
     try {
       const result = await traineeService.addTrainee(addEmail.trim(), addDomain.trim() || undefined);
       if (result.invited) {
-        setAddSuccess(t('coach.inviteSent', { email: result.email }));
+        if (result.inviteLink) setLastInviteLink(result.inviteLink);
+        if (result.emailDelivered === false && result.message) {
+          setAddSuccess(result.message);
+          setAddSuccessWarning(true);
+        } else {
+          const baseMsg = t('coach.inviteSent', { email: result.email });
+          setAddSuccess(
+            result.inviteLink ? `${baseMsg} ${t('coach.shareLinkBelow')}` : baseMsg
+          );
+        }
         setAddEmail('');
         setAddDomain('');
       } else {
@@ -98,7 +111,13 @@ export default function TraineeListPage() {
           </h2>
           <button
             type="button"
-            onClick={() => { setShowAddForm(!showAddForm); setAddError(''); setAddSuccess(''); }}
+            onClick={() => {
+              setShowAddForm(!showAddForm);
+              setAddError('');
+              setAddSuccess('');
+              setLastInviteLink('');
+              setAddSuccessWarning(false);
+            }}
             className="px-5 py-2.5 bg-sage text-cream font-medium rounded-2xl hover:bg-sage-light transition-colors duration-300"
           >
             {showAddForm ? t('coach.cancelAdd') : t('coach.addTrainee')}
@@ -106,8 +125,31 @@ export default function TraineeListPage() {
         </div>
 
         {addSuccess && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-2xl text-charcoal text-sm">
-            {addSuccess}
+          <div
+            className={`mb-6 p-4 rounded-2xl text-charcoal text-sm ${
+              addSuccessWarning
+                ? 'bg-amber-50 border border-amber-300'
+                : 'bg-green-50 border border-green-200'
+            }`}
+          >
+            <p className="mb-2">{addSuccess}</p>
+            {lastInviteLink && (
+              <div className="mt-3 pt-3 border-t border-sand-dark/40">
+                <p className="text-xs text-charcoal-light mb-1">{t('coach.inviteLinkLabel')}</p>
+                <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+                  <code className="flex-1 block text-xs break-all bg-white/70 p-2 rounded-lg border border-sand-dark">
+                    {lastInviteLink}
+                  </code>
+                  <button
+                    type="button"
+                    onClick={() => navigator.clipboard.writeText(lastInviteLink)}
+                    className="shrink-0 px-4 py-2 bg-sage text-cream text-sm font-medium rounded-xl hover:bg-sage-light"
+                  >
+                    {t('coach.copyInviteLink')}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

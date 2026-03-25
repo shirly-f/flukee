@@ -30,6 +30,9 @@
     "domainLabel": "Focus area (optional)",
     "domainPlaceholder": "e.g. fitness, nutrition, mindfulness",
     "inviteSent": "Invitation sent to {{email}}",
+    "shareLinkBelow": "You can also share this link if email does not arrive:",
+    "inviteLinkLabel": "Sign-up link for your trainee",
+    "copyInviteLink": "Copy link",
     "traineeAdded": "{{name}} has been added to your clients"
   },
   "dashboard": {
