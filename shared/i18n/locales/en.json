@@ -21,7 +21,15 @@
     "checkCredentials": "Please check your credentials and try again.",
     "or": "or",
     "invitedYou": "invited you to Flukee",
-    "focusArea": "Focus area"
+    "focusArea": "Focus area",
+    "inviteHowTo": "Create an account with a password, sign in if you already have one, or use Google with the same email as this invite.",
+    "createAccount": "Create account",
+    "iHavePassword": "I already have a password",
+    "yourName": "Your name",
+    "choosePassword": "Choose a password",
+    "createAccountSubmit": "Create account and sign in",
+    "fillNamePassword": "Please enter your name and password.",
+    "googleSameEmail": "With Google, use the same email address as on this invitation."
   },
   "coach": {
     "addTrainee": "Add trainee",

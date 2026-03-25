@@ -21,7 +21,15 @@
     "checkCredentials": "נא לבדוק את פרטי ההתחברות ולנסות שוב.",
     "or": "או",
     "invitedYou": "הזמין אותך ל-Flukee",
-    "focusArea": "תחום התמחות"
+    "focusArea": "תחום התמחות",
+    "inviteHowTo": "צרו חשבון עם סיסמה, התחברו אם כבר יש לכם חשבון, או השתמשו בגוגל עם אותה כתובת מייל כמו בהזמנה.",
+    "createAccount": "יצירת חשבון",
+    "iHavePassword": "כבר יש לי סיסמה",
+    "yourName": "השם שלכם",
+    "choosePassword": "בחרו סיסמה",
+    "createAccountSubmit": "צרו חשבון והתחברו",
+    "fillNamePassword": "נא למלא שם וסיסמה.",
+    "googleSameEmail": "בגוגל, השתמשו באותה כתובת מייל כמו בהזמנה."
   },
   "coach": {
     "addTrainee": "הוסף מתאמן",

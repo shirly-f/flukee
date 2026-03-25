@@ -19,11 +19,17 @@ export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const inviteToken = searchParams.get('invite') || undefined;
   const [invitePreview, setInvitePreview] = useState(null);
+  const [inviteMode, setInviteMode] = useState(() => (searchParams.get('invite') ? 'register' : 'login'));
+  const [registerName, setRegisterName] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
 
   useEffect(() => {
     if (!inviteToken) return;
     api.get(`/auth/invite/${inviteToken}`)
-      .then((r) => setInvitePreview(r.data))
+      .then((r) => {
+        setInvitePreview(r.data);
+        if (r.data?.email) setEmail(r.data.email);
+      })
       .catch(() => setInvitePreview(null));
   }, [inviteToken]);
 
@@ -61,8 +67,25 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await login(email, password, inviteToken);
-      navigate(res.user?.role === 'trainee' ? '/my-tasks' : '/trainees');
+      if (inviteToken && inviteMode === 'register') {
+        if (!registerName.trim() || !registerPassword) {
+          setError(t('login.fillNamePassword'));
+          setLoading(false);
+          return;
+        }
+        const res = await authService.register(
+          email.trim(),
+          registerPassword,
+          registerName.trim(),
+          'trainee',
+          inviteToken
+        );
+        setSession(res.token, res.user);
+        navigate('/my-tasks');
+      } else {
+        const res = await login(email, password, inviteToken);
+        navigate(res.user?.role === 'trainee' ? '/my-tasks' : '/trainees');
+      }
     } catch (err) {
       if (!err.response) {
         setError('Cannot reach the server. Set VITE_API_BASE_URL in Netlify to your Render backend URL.');
@@ -91,13 +114,38 @@ export default function LoginPage() {
           </div>
 
           {invitePreview && (
-            <div className="mb-6 p-4 bg-sage/10 border border-sage/30 rounded-2xl text-charcoal text-sm">
-              <strong>{invitePreview.coachName}</strong> {t('login.invitedYou')}
+            <div className="mb-6 p-4 bg-sage/10 border border-sage/30 rounded-2xl text-charcoal text-sm space-y-2">
+              <p>
+                <strong>{invitePreview.coachName}</strong> {t('login.invitedYou')}
+              </p>
               {invitePreview.domain && (
-                <span className="block mt-1 text-charcoal-light">
+                <span className="block text-charcoal-light">
                   {t('login.focusArea')}: {invitePreview.domain}
                 </span>
               )}
+              <p className="text-charcoal-light text-xs border-t border-sage/20 pt-2 mt-2">
+                {t('login.inviteHowTo')}
+              </p>
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => { setInviteMode('register'); setError(''); }}
+                  className={`flex-1 py-2 px-3 rounded-xl text-sm font-medium transition-colors ${
+                    inviteMode === 'register' ? 'bg-sage text-cream' : 'bg-sand/50 text-charcoal hover:bg-sand'
+                  }`}
+                >
+                  {t('login.createAccount')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setInviteMode('login'); setError(''); }}
+                  className={`flex-1 py-2 px-3 rounded-xl text-sm font-medium transition-colors ${
+                    inviteMode === 'login' ? 'bg-sage text-cream' : 'bg-sand/50 text-charcoal hover:bg-sand'
+                  }`}
+                >
+                  {t('login.iHavePassword')}
+                </button>
+              </div>
             </div>
           )}
 
@@ -131,21 +179,46 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-5 py-4 rounded-2xl border border-sand-dark bg-sand/30 text-charcoal focus:border-sage"
+                readOnly={Boolean(inviteToken && invitePreview?.email)}
+                className={`w-full px-5 py-4 rounded-2xl border border-sand-dark text-charcoal focus:border-sage ${
+                  inviteToken && invitePreview?.email ? 'bg-sand/50' : 'bg-sand/30'
+                }`}
               />
             </div>
 
+            {inviteToken && inviteMode === 'register' && (
+              <div>
+                <label htmlFor="register-name" className="block text-charcoal font-medium mb-2">
+                  {t('login.yourName')}
+                </label>
+                <input
+                  id="register-name"
+                  type="text"
+                  required
+                  autoComplete="name"
+                  value={registerName}
+                  onChange={(e) => setRegisterName(e.target.value)}
+                  className="w-full px-5 py-4 rounded-2xl border border-sand-dark bg-sand/30 text-charcoal focus:border-sage"
+                />
+              </div>
+            )}
+
             <div>
               <label htmlFor="password" className="block text-charcoal font-medium mb-2">
-                {t('login.password')}
+                {inviteToken && inviteMode === 'register' ? t('login.choosePassword') : t('login.password')}
               </label>
               <input
                 id="password"
                 name="password"
                 type="password"
                 required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                autoComplete={inviteMode === 'register' ? 'new-password' : 'current-password'}
+                value={inviteToken && inviteMode === 'register' ? registerPassword : password}
+                onChange={(e) =>
+                  inviteToken && inviteMode === 'register'
+                    ? setRegisterPassword(e.target.value)
+                    : setPassword(e.target.value)
+                }
                 className="w-full px-5 py-4 rounded-2xl border border-sand-dark bg-sand/30 text-charcoal focus:border-sage"
               />
             </div>
@@ -155,36 +228,47 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full py-4 bg-sage text-cream font-medium rounded-2xl hover:bg-sage-light transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? t('login.signingIn') : t('login.signIn')}
+              {loading
+                ? t('login.signingIn')
+                : inviteToken && inviteMode === 'register'
+                ? t('login.createAccountSubmit')
+                : t('login.signIn')}
             </button>
 
-            <div className="mt-6">
-              <div className="relative my-4">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-sand-dark" />
+            {(!inviteToken || inviteMode === 'login') && (
+              <div className="mt-6">
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-sand-dark" />
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-cream text-charcoal-light">{t('login.or')}</span>
+                  </div>
                 </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-cream text-charcoal-light">{t('login.or')}</span>
-                </div>
+                {import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
+                  <div className="flex justify-center">
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={handleGoogleError}
+                      useOneTap={false}
+                      theme="filled_black"
+                      size="large"
+                      text="continue_with"
+                      shape="rectangular"
+                    />
+                  </div>
+                ) : (
+                  <p className="text-center text-charcoal-light text-sm">
+                    {t('login.googleNotConfigured')}
+                  </p>
+                )}
+                {inviteToken && (
+                  <p className="text-center text-charcoal-light text-xs mt-2">
+                    {t('login.googleSameEmail')}
+                  </p>
+                )}
               </div>
-              {import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
-                <div className="flex justify-center">
-                  <GoogleLogin
-                    onSuccess={handleGoogleSuccess}
-                    onError={handleGoogleError}
-                    useOneTap={false}
-                    theme="filled_black"
-                    size="large"
-                    text="continue_with"
-                    shape="rectangular"
-                  />
-                </div>
-              ) : (
-                <p className="text-center text-charcoal-light text-sm">
-                  {t('login.googleNotConfigured')}
-                </p>
-              )}
-            </div>
+            )}
           </form>
 
           <div className="mt-8 pt-6 border-t border-sand-dark/50">
